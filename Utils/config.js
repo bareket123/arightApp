@@ -1,0 +1,1 @@
+export const RAPIDAPI_KEY = '29f3773d28msh4005745bd43a895p1a71acjsnc5350d1468dc';
