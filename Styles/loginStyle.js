@@ -1,4 +1,5 @@
 import {Animated, StyleSheet} from 'react-native';
+import { shadow } from 'react-native-paper';
 const glowValue = new Animated.Value(0);
 
 const loginStyle = StyleSheet.create({
@@ -8,16 +9,23 @@ const loginStyle = StyleSheet.create({
     },
 
     viewStyle:{
+        
         justifyContent: 'center',
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius:60,
+        borderRadius:100,
+        
        
     },
 
     textInput:{
         width:300,
-        backgroundColor:'transparent'
+        paddingBottom:5,
+        borderRadius:100,
+        backgroundColor:'transparent',
+        
+              
+        
     },
 
     warningText:{
@@ -30,7 +38,11 @@ const loginStyle = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 10,
         marginTop:10,
-        color:'white',
+        color: "white",
+        textShadowColor: 'rgba(0, 0,0, 0.7)',
+        textShadowOffset: {width: -1, height:-1},
+        textShadowRadius: 10,
+        fontWeight:'bold',
         shadowColor:'red'
     },
 
@@ -59,7 +71,7 @@ const loginStyle = StyleSheet.create({
         paddingLeft:20,
         paddingBottom:40,
         alignItems:'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        backgroundColor: 'rgba(128, 0, 128, 0.1)',
         borderRadius:50,
         shadowColor: 'darkred', // Glowing effect color
         shadowOffset: { width: 0, height: 0 },
@@ -117,19 +129,24 @@ const loginStyle = StyleSheet.create({
         textColor:"white",
         fontWeight:"bold",
         fontSize:16,
-        paddingTop:20
+        paddingTop:20,
+        textShadowColor: 'rgba(0, 0,0, 0.7)',
+        textShadowOffset: {width: -1, height:-1},
+        textShadowRadius: 10,
     },
     loginLineText:{
         fontWeight:"bold",
         fontSize:16,
         paddingTop:20,
-        color:"white"
+        color:"white",
+        textShadowColor: 'rgba(0, 0,0, 0.7)',
+        textShadowOffset: {width: -1, height:-1},
+        textShadowRadius: 10,
 
 
     },
     containerVideo: {
         flex: 1,
-        backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
     },
