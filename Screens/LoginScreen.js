@@ -1,10 +1,11 @@
+import axios from 'axios';
 import React, {useState} from 'react';
 import { ScrollView, Text, View, Image, StyleSheet,ImageBackground} from 'react-native';
 import {Button,  TextInput} from 'react-native-paper';
 import  loginStyle from '../Styles/loginStyle'
 import  homeStyle from '../Styles/HomeStyle'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-
+ const LOCAL_SERVER_URL='http://10.0.0.7:5000';
 
 
 /*
@@ -18,31 +19,68 @@ export default function Login () {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [checked, setChecked] = useState('login');
+    const [isPressed, setIsPressed] = useState(false);
     const [isPasswordVisible, setPasswordVisible] = useState(false);
     //const [hasStartedFillingFields, setHasStartedFillingFields] = useState(false);
      const [toMinimize, setToMinimize] = useState(false);
 
 
-  const handleUpdateUser = async () => {
-    e.preventDefault();
+ const handleAddUser = async () => {
+ console.log("after submit is pressed");
+ const data = {
+                username: usernameInput,
+                password: password,
+                phone: phone
+            };
+    if(checked=='signUp'){
+        try {
 
-    const response = await fetch(`http://localhost:5000/users/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ usernameInput, password,phone }),
-    });
+            const response = await axios.post(`${LOCAL_SERVER_URL}/add_user`, data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-    if (response.ok) {
-      const result = await response.json();
-      setMessage(result.message);
-    } else {
-      const error = await response.json();
-      setMessage(error.error || 'Error updating user');
-    }
-  };
+            if (response.status === 200) {
+                console.log('User added successfully:', response.data);
+               alert('User added successfully');
+               setChecked('login');
+            } else {
+                console.error('Error adding user:', response.data);
+                alert('Error', `Error adding user: ${response.data.error}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error', 'Error adding user');
+        }
+    }else{
+        try{
+            const response = await axios.post(`${LOCAL_SERVER_URL}/get_user`, data, {
+               
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+                 console.log(data);
+            if (response.status === 200) {
+                console.log('found User:', response.data);
+               alert('Login successfully');
 
+            } else {
+                console.log('Error founding user:', response.data);
+                alert(`Error founding user: ${response.data.error}`);
+            }
+
+        }catch(error ){
+              console.error('Error:', error);
+             alert('Error finding user');
+        }
+            
+        }
+
+        clearAll();
+      
+    };
 
    const loginButton = () => {
      if (checked==='login')
@@ -55,12 +93,13 @@ export default function Login () {
 
     async function handleSubmitPressed() {
         let res;
+        setIsPressed(!isPressed)
         try {
-         handleUpdateUser
+         handleUpdateUser()
         } catch (error) {
 
         }
-        clearButton()
+        clearAll()
     }
 
 
@@ -78,7 +117,7 @@ export default function Login () {
         return validToPress;
     }
 
-    function clearButton() {
+    function clearAll() {
         setUsernameInput("")
         setPassword("")
         setConfirmPassword("")
@@ -89,6 +128,15 @@ export default function Login () {
 function checkEmptyString(str){
  return str.length===0;
  
+}
+function passwordCheck(){
+   
+    if(checkEmptyString(password) || password.length<12){
+         console.log("P is "+password)
+     console.log("L is "+password.length)
+        return true
+    }
+    return false;
 }
 
 
@@ -112,8 +160,6 @@ function checkEmptyString(str){
                                             value={usernameInput}
                                            
                                             textColor={'white'}
-                                    
-                                            //underlineStyle={loginStyle.underlineStyle}
                                             onChangeText={(text) => {
                                                 setUsernameInput(text);
                                         
@@ -128,9 +174,9 @@ function checkEmptyString(str){
                                             placeholder="Password"
                                             value={password}
                                             mode={"outlined"}
-                                             backgroundColor={checkEmptyString(password)?"rgba(128, 0, 128, 0.4)":"#9CE675"}
+                                             backgroundColor={checkEmptyString(password) || password.length<12?"rgba(128, 0, 128, 0.4)":"#9CE675"}
                                             placeholderTextColor={'white'}
-                                           // underlineStyle={loginStyle.underlineStyle}
+                                
                                             onChangeText={(text) => {
                                                 setPassword(text);
                                                
@@ -149,16 +195,17 @@ function checkEmptyString(str){
                                                     <TextInput
                                                         placeholder="Confirm Password"
                                                         mode={"outlined"}
-                                                        backgroundColor={checkEmptyString(confirmPassword)?"rgba(128, 0, 128, 0.4)":"#9CE675"}
+                                                        backgroundColor={((password.length===0&&confirmPassword.length===0)||password!==confirmPassword)?"rgba(128, 0, 128, 0.4)":"#9CE675"}
                                                         textColor={'white'}
                                                         placeholderTextColor={'white'}
                                                         //underlineStyle={loginStyle.underlineStyle}
                                                         value={confirmPassword}
                                                         onChangeText={(text) => {
+                                                        
                                                             setConfirmPassword(text);
                                                          
                                                         }}
-                                                        style={[loginStyle.textInput, ((password !== confirmPassword) && (password.length !== 0&& confirmPassword.length!==0)) && { backgroundColor: '#8B0000'}] }
+                                                        style={[loginStyle.textInput, ((password !== confirmPassword) && (password.length !== 0 && confirmPassword.length!==0)) && { backgroundColor: '#8B0000'}] }
                                                         secureTextEntry={true}
                                                     />
                                                 </View>
@@ -166,31 +213,47 @@ function checkEmptyString(str){
                                                     <TextInput
                                                         placeholder="Phone number"
                                                         mode={"outlined"}                                            
-                                                         backgroundColor={checkEmptyString(phone)?"rgba(128, 0, 128, 0.4)":"#9CE675"}
+                                                         backgroundColor={checkEmptyString(phone) ||phone.length!=10 ?"rgba(128, 0, 128, 0.4)":"#9CE675"}
                                                         textColor={'white'}
                                                         placeholderTextColor={'white'}
-                                                        //underlineStyle={loginStyle.underlineStyle}
+                                                    
                                                         value={phone}
                                                         onChangeText={(text) => {
                                                             setPhone(text);
                                                             
+                                                            
                                                         }}
-                                                        style={[loginStyle.textInput, ((password !== confirmPassword) && (password.length !== 0&& confirmPassword.length!==0)) && { backgroundColor: '#8B0000'}] }
-                                                        type="numeric"
+                                                        //((password !== confirmPassword) && (password.length !== 0&& confirmPassword.length!==0)) && { backgroundColor: '#8B0000'}
+                                                        style={[loginStyle.textInput, (phone.length>=0 && phone.length!=10) && { color: '#8B0000'}] }
+                                                        keyboardType="numeric"
                                                     />
                                                 </View>
                                             </View>
                                         }
-                                        <Button textColor={"darkred"} rippleColor={"white"}  style={loginStyle.loginLineButton} onPress={handleSubmitPressed}>Submit</Button>
+                                        <Button textColor={"darkred"} rippleColor={"white"}  style={loginStyle.loginLineButton} onPress={handleAddUser}>Submit</Button>
                                         <View style={{ flexDirection: "row",  flexWrap: 'wrap', justifyContent: 'center',alignItems: "center"}}>
                                             <Text style={loginStyle.loginLineText}>{checked==='signUp'?'Already have an account ?':"Don't have an account ?"}</Text>
                                             <Button textColor={"white"} rippleColor={"white"} icon="account-edit" 
                                             labelStyle={{ fontWeight:'bold',textShadowColor: 'rgba(0, 0,0, 0.9)', textShadowOffset: {width: -1, height:-1},textShadowRadius: 10}}  style={loginStyle.loginLineButton} onPress={loginButton}>{checked==='signUp'?'Login':'Sign Up'}</Button>
                                         </View>
                                     </View>
-                                    <View style={{flexDirection:'row'}}>
+                                    {
+                                        (!checkValidation&& isPressed)&&   
+                                    <View style={loginStyle.warningText} >
+                                    <Text>
+                                        Please make sure all filled as properly
+                                    </Text>
+                                    {
+                                        password!==confirmPassword&&
+                                        <Text>
+                                         passwords not identcal
+                                        </Text>
+                                    
 
+                                    }
                                     </View>
+                                    }
+                                    
                                 </View>
                             </View>
                         }
