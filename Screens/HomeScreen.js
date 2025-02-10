@@ -1,17 +1,34 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View,Text,Image, TouchableOpacity,ImageBackground,SafeAreaView } from 'react-native';
 import homeStyle from "../Styles/HomeStyle";
 import { Video} from "expo-av";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
 
 const HomeScreen = ({navigation}) => {
+    const [username,setUsername]=useState("guest");
+
+    useEffect(() => {
+        const fetchUsername = async () => {
+            try {
+                let name = await AsyncStorage.getItem("username");
+                setUsername(name ? name : "guest");
+            } catch (error) {
+                console.error("Failed to load username", error);
+            }
+        };
+
+        fetchUsername();
+    }, [username]);
+
+
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
         <ImageBackground source={require('../Images/homeBackground.jpg')} style={homeStyle.background}>
-           <Text style={homeStyle.userWelcomeText}>HELLO USER</Text>
+           <Text style={homeStyle.userWelcomeText}>HELLO {username}</Text>
             <View style={homeStyle.mainView}>
                 <Text style={homeStyle.header}>What Would You Like To Do ?</Text>
                 <View style={{flexDirection: 'row'}}>

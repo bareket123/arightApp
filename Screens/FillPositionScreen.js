@@ -11,10 +11,9 @@ const FillPositionScreen = ({navigation}) => {
     const [coordinates, setCoordinates] = useState(null);
 
 /*
-נשאר להוסיף לשרת מיקום 
+נשאר להוסיף לשרת מיקום
 לעשות בקשה שתחזיר תמונה של המקום
 */
-
 
     //
     // const handleSearch = async () => {
@@ -42,12 +41,12 @@ const FillPositionScreen = ({navigation}) => {
             value={userAddress}
             onChangeText={(text) => { setUserAddress(text) }}
         />
-  <TouchableOpacity>
-    <Text style={positionStyle.searchButton}>search🔎</Text>
-  </TouchableOpacity>
+  {/*<TouchableOpacity>*/}
+  {/*  <Text style={positionStyle.searchButton}>search🔎</Text>*/}
+  {/*</TouchableOpacity>*/}
 </View>
 
-          
+
 
             <MapView
                 provider={PROVIDER_DEFAULT}
@@ -59,7 +58,7 @@ const FillPositionScreen = ({navigation}) => {
                     longitudeDelta: 5,
                 }}
             >
-             
+
 
             </MapView>
 
@@ -73,7 +72,7 @@ const FillPositionScreen = ({navigation}) => {
 //         justifyContent: 'center',
 //         alignItems: 'center',
 //         backgroundColor:"black"
-       
+
 //     },
 //     map: {
 //        width:Dimensions.get('window').width,
@@ -81,7 +80,7 @@ const FillPositionScreen = ({navigation}) => {
 //     },
 //     inputView:{
 //     flexDirection: 'row',
-//      paddingTop: 100, 
+//      paddingTop: 100,
 //      justifyContent: 'center',
 //     },
 //     input: {
@@ -100,7 +99,7 @@ const FillPositionScreen = ({navigation}) => {
 //         borderRadius: 10,
 //         color:"#007fff",
 
-//     }, 
+//     },
 
 // });
 export default FillPositionScreen;

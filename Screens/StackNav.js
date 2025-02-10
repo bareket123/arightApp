@@ -23,6 +23,7 @@ const StackNav = () => {
 
         >
             <Tab.Screen
+                key="home tab"
                 name="Home"
                 component={HomePage}
                 options={{
@@ -36,6 +37,7 @@ const StackNav = () => {
                 }}
             />
             <Tab.Screen
+                key="Login tab"
                 name="Login"
                 component={LoginPage}
                 options={{
@@ -46,6 +48,7 @@ const StackNav = () => {
                 }}
             />
             <Tab.Screen
+                key="Setting tab"
                 name='Setting'
                 component={ProfileSettingScreen}
                 options={{
@@ -55,6 +58,7 @@ const StackNav = () => {
                     ),
                 }}/>
             <Tab.Screen
+                key="Position tab"
                 name="My Position"
                 component={FillPositionScreen}
                 options={{
@@ -65,6 +69,7 @@ const StackNav = () => {
                 }}
                 />
              <Tab.Screen
+                 key="Contacts tab"
                 name="Add Contacts"
                 component={AddContactScreen}
                 options={{
