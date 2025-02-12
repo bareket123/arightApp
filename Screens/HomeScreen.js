@@ -3,24 +3,19 @@ import { View,Text,Image, TouchableOpacity,ImageBackground,SafeAreaView } from '
 import homeStyle from "../Styles/HomeStyle";
 import { Video} from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import fetchUsername from "../Utils/Persist"
 
 
 
 const HomeScreen = ({navigation}) => {
     const [username,setUsername]=useState("guest");
 
-    useEffect(() => {
-        const fetchUsername = async () => {
-            try {
-                let name = await AsyncStorage.getItem("username");
-                setUsername(name ? name : "guest");
-            } catch (error) {
-                console.error("Failed to load username", error);
+    useEffect( () => {
+            const getUsername = async () => {
+              setUsername(await fetchUsername)
             }
-        };
+        getUsername();
 
-        fetchUsername();
     }, [username]);
 
 

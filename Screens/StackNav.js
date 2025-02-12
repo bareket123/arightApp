@@ -1,89 +1,75 @@
+import React from "react";
 import HomePage from "./HomeScreen";
-import LoginPage from "./LoginScreen";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
-import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import ProfileSettingScreen from "./ProfileSettingScreen";
 import FillPositionScreen from "./FillPositionScreen";
 import AddContactScreen from "./AddContactScreen";
-// import ProfileSettingScreen from "./ProfileSettingScreen";
-// import FillPositionScreen from "./FillPositionScreen";
-// import AddContactScreen from "./AddContactScreen";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
+import { TouchableOpacity } from "react-native";
 
-const Tab = createMaterialBottomTabNavigator();
+const StackNav = ({ onLogout }) => {
+    const Tab = createMaterialBottomTabNavigator();
 
-const StackNav = () => {
     return (
-       <Tab.Navigator
+        <Tab.Navigator
             initialRouteName="Home"
             activeColor="white"
-            theme={{ colors: { onSurface: 'white', onSurfaceVariant: 'lightblue',fontsize:14 }}}
-
-            barStyle={{ backgroundColor: 'rgba(165, 0, 0, 0.5)',color:"white"}}
-
+            theme={{ colors: { onSurface: "white", onSurfaceVariant: "lightblue", fontsize: 14 } }}
+            barStyle={{ backgroundColor: "rgba(165, 0, 0, 0.5)", color: "white" }}
         >
             <Tab.Screen
-                key="home tab"
                 name="Home"
                 component={HomePage}
                 options={{
-                    tabBarLabel: 'Home',
-                    tabBarIcon: ({color}) => (
-                        <MaterialCommunityIcons name="home" color={"darkred"}  size={26} />
-                    ),
-                    tabBarLabelStyle: {
-                        color: 'darkred', // Change label color here
-                    },
+                    tabBarLabel: "Home",
+                    tabBarIcon: () => <MaterialCommunityIcons name="home" color="darkred" size={26} />,
                 }}
             />
             <Tab.Screen
-                key="Login tab"
-                name="Login"
-                component={LoginPage}
-                options={{
-                    tabBarLabel: 'Login',
-                    tabBarIcon: ({ color }) => (
-                        <MaterialCommunityIcons name="login" color={"#FF007F"} size={26} />
-                    ),
-                }}
-            />
-            <Tab.Screen
-                key="Setting tab"
-                name='Setting'
+                name="Setting"
                 component={ProfileSettingScreen}
                 options={{
-                    tabBarLabel: 'Setting',
-                    tabBarIcon: ({ color }) => (
-                        <MaterialCommunityIcons name="tools" color={"grey"} size={26} />
-                    ),
-                }}/>
+                    tabBarLabel: "Setting",
+                    tabBarIcon: () => <MaterialCommunityIcons name="tools" color="grey" size={26} />,
+                }}
+            />
             <Tab.Screen
-                key="Position tab"
                 name="My Position"
                 component={FillPositionScreen}
                 options={{
-                    tabBarLabel: 'My Position',
-                    tabBarIcon: ({ color }) => (
-                        <MaterialCommunityIcons name="google-maps" color={"green"} size={26} />
-                    ),
+                    tabBarLabel: "My Position",
+                    tabBarIcon: () => <MaterialCommunityIcons name="google-maps" color="green" size={26} />,
                 }}
-                />
-             <Tab.Screen
-                 key="Contacts tab"
+            />
+            <Tab.Screen
                 name="Add Contacts"
                 component={AddContactScreen}
                 options={{
-                    tabBarLabel: 'Add Contacts',
-                    tabBarIcon: ({ color }) => (
-                        <MaterialCommunityIcons name="contacts" color={"#00acdf"} size={26} />
-                    ),
+                    tabBarLabel: "Add Contacts",
+                    tabBarIcon: () => <MaterialCommunityIcons name="contacts" color="#00acdf" size={26} />,
                 }}
             />
 
-
+            {/* Custom Logout Button */}
+            <Tab.Screen
+                name="Logout"
+                component={HomePage} // Dummy component
+                options={{
+                    tabBarLabel: "Logout",
+                    tabBarIcon: () => (
+                        <TouchableOpacity onPress={onLogout}>
+                            <MaterialCommunityIcons name="logout" color="red" size={26} />
+                        </TouchableOpacity>
+                    ),
+                }}
+                listeners={{
+                    tabPress: (e) => {
+                        e.preventDefault(); // Prevent tab from navigating
+                        onLogout();
+                    },
+                }}
+            />
         </Tab.Navigator>
-
-
     );
 };
 
