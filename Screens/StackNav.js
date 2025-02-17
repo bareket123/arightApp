@@ -7,7 +7,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import { TouchableOpacity } from "react-native";
 
-const StackNav = ({ onLogout }) => {
+const StackNav = ({ onLogout,username }) => {
     const Tab = createMaterialBottomTabNavigator();
 
     return (
@@ -28,6 +28,7 @@ const StackNav = ({ onLogout }) => {
             <Tab.Screen
                 name="Setting"
                 component={ProfileSettingScreen}
+                initialParams={{ username }}
                 options={{
                     tabBarLabel: "Setting",
                     tabBarIcon: () => <MaterialCommunityIcons name="tools" color="grey" size={26} />,
@@ -44,6 +45,7 @@ const StackNav = ({ onLogout }) => {
             <Tab.Screen
                 name="Add Contacts"
                 component={AddContactScreen}
+                initialParams={{ username }}
                 options={{
                     tabBarLabel: "Add Contacts",
                     tabBarIcon: () => <MaterialCommunityIcons name="contacts" color="#00acdf" size={26} />,
@@ -57,17 +59,17 @@ const StackNav = ({ onLogout }) => {
                 options={{
                     tabBarLabel: "Logout",
                     tabBarIcon: () => (
-                        <TouchableOpacity onPress={onLogout}>
+                        <TouchableOpacity key="logout-button" onPress={onLogout}>
                             <MaterialCommunityIcons name="logout" color="red" size={26} />
                         </TouchableOpacity>
                     ),
                 }}
-                listeners={{
-                    tabPress: (e) => {
-                        e.preventDefault(); // Prevent tab from navigating
-                        onLogout();
-                    },
-                }}
+                // listeners={{
+                //     tabPress: (e) => {
+                //         e.preventDefault(); // Prevent tab from navigating
+                //         onLogout();
+                //     },
+                // }}
             />
         </Tab.Navigator>
     );

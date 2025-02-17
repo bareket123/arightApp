@@ -16,13 +16,15 @@ export default function Login({ setIsLoggedIn }) {
     const [toMinimize, setToMinimize] = useState(false);
 
     const handleAddUser = async () => {
+        console.log("submit pressed")
         const axiosInstance = axios.create({ baseURL: LOCAL_SERVER_URL });
+
         const data = {
             name: usernameInput,
             password: password,
             phone: phone
         };
-        if (checked === 'signUp') {
+        if (checked == 'signUp') {
             try {
                 const res = await axiosInstance.post('/users/add_user', data, {
                     headers: { "Content-Type": "application/json" }
@@ -42,8 +44,17 @@ export default function Login({ setIsLoggedIn }) {
                 setIsLoggedIn(true);  // ✅ Trigger re-render in App.js
             } catch (error) {
                 console.log("Request error:", error.response?.data || error.message + " " + error.error_code);
-                if (error.error_code == "1000") alert("Invalid username or password");
-                if (error.response) alert("Something went wrong " + error.response.data);
+                if (error.error_code == "1000"){
+                    alert("Invalid username or password");
+                    console.log("wwwww")
+
+                }
+                if (error.response){
+                    alert("Something went wrong " + error.response.data);
+                    console.log("ddddd")
+                }
+
+                console.log("out side")
             }
         }
     };

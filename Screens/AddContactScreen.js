@@ -3,29 +3,52 @@ import { View, Text, Button,ScrollView } from 'react-native';
 import * as Contacts from 'expo-contacts';
 import contactStyle from '../Styles/contactsStyle';
 import { DataTable, TextInput } from 'react-native-paper';
+import axios from "axios";
+import {LOCAL_SERVER_URL} from "../Utils/Constants";
 
 
 
-export default function AddContactsScreen() {
+export default function AddContactsScreen({route}) {
   const [userContacts, setUserContacts] = useState([]);
   const [hasPermission, setHasPermission] = useState(null);
   const [searchContact, setSearchContact] = useState("");
   const [filterArray,setFilterArray]=useState([]);
- 
+
+
+  const { username } = route.params || {};
+
   useEffect(() => {
   getPremition();
   if (hasPermission){
      fetchContacts();
   }
- 
+
   }, [hasPermission]);
 
 
   const getPremition= async()=>{
    const { status } = await Contacts.requestPermissionsAsync();
       setHasPermission(status === 'granted');
-      
+
   }
+
+  const formatPhoneNumber = (phoneNumber) => {
+    let correctFormat="";
+    if (!phoneNumber) return "no number";
+    if (phoneNumber.includes("-")){
+       correctFormat=phoneNumber.replaceAll("-","")
+    }
+
+
+    if (phoneNumber.startsWith("+972")) {
+      correctFormat= "0" + phoneNumber.slice(4); // מחזיר ל-05X
+    }
+
+    // console.log("correct format: "+ correctFormat)
+
+    return correctFormat;
+  };
+
 
   const fetchContacts = async () => {
     if (hasPermission) {
@@ -38,20 +61,49 @@ export default function AddContactsScreen() {
       }
     }
   };
-const filterContactsArray = () => {
-  if (Array.isArray(userContacts) && userContacts.length > 0 && typeof searchContact === 'string' && searchContact.length > 0) {
-    setFilterArray(
-      userContacts.filter((contact) => 
-        contact && contact.name && 
-        (contact.name.includes(searchContact) || contact.name.toLowerCase().startsWith(searchContact.toLowerCase()))
-      )
-    );
-  } else {
-    // Handle cases where userContacts is not an array or searchContact is not a valid string
-    setFilterArray([]);
-  }
-};
+  const filterContactsArray = () => {
+    if (Array.isArray(userContacts) && userContacts.length > 0 && typeof searchContact === 'string' && searchContact.length > 0) {
+      const filtered = userContacts
+          .filter((contact) =>
+              contact?.name &&
+              (contact.name.includes(searchContact) || contact.name.toLowerCase().startsWith(searchContact.toLowerCase()))
+          )
+          // Ensure case-insensitive sorting
 
+      setFilterArray(filtered.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
+      for (let i = 0; i < filtered.length; i++) {
+        console.log(i+" - " +filtered[i])
+      }
+    } else {
+      setFilterArray([]);
+    }
+  };
+
+  const addContact = async (contactName, contactPhone) => {
+    console.log()
+    console.log()
+    console.log()
+    console.log("phone: "+ contactPhone )
+    const axiosInstance = axios.create({baseURL: LOCAL_SERVER_URL});
+    if (username){
+    const dataToSend = {
+      username: username,
+      name: contactName,
+      phone: contactPhone
+    }
+    try {
+      const res = await axiosInstance.post('/contacts/add_contact', dataToSend, {
+        headers: {"Content-Type": "application/json"}
+      });
+      console.log("nnn: "+res.data.message);
+    } catch (error) {
+      console.error("Request error:", error.response?.data || error.message);
+      if (error.response.errorCode==200){
+        alert("added")
+      }
+    }
+    }
+  }
 
   return (
     <View style={contactStyle.mainView}>
@@ -67,40 +119,40 @@ const filterContactsArray = () => {
      onChangeText={(text) => {
         setSearchContact(text);
         filterContactsArray()
-      
-   }}/> 
- 
+
+   }}/>
+
     <DataTable style={contactStyle.container}>
       <DataTable.Header style={contactStyle.tableHeader}>
         <DataTable.Title>Name</DataTable.Title>
         <DataTable.Title>Phone Number</DataTable.Title>
         <DataTable.Title>Add to List</DataTable.Title>
       </DataTable.Header>
-      { userContacts.length>0&&( 
+      { userContacts.length>0&&(
         (searchContact == "" ? userContacts : filterArray).map((current, index) => (
         <DataTable.Row key={index}>
           <DataTable.Cell style={contactStyle.tableCell}>{current.name}</DataTable.Cell>
           {current.phoneNumbers && current.phoneNumbers.length > 0 ? (
             current.phoneNumbers.map((phone, phoneIndex) => (
               <DataTable.Cell style={contactStyle.tableCell} key={`${index}-${phoneIndex}`}>
-                {phone.number ? phone.number : "no number"}
-              </DataTable.Cell> 
+                {phone.number ? formatPhoneNumber(phone.number) : "no number"}
+              </DataTable.Cell>
             ))
           ) : (
             <DataTable.Cell style={contactStyle.tableCell} key={`${index}-no-number`}>no number</DataTable.Cell>
           )}
-          <DataTable.Cell style={contactStyle.tableCell} onPress={() => alert("added")}>
+          <DataTable.Cell style={contactStyle.tableCell} onPress={() => addContact(current.name,formatPhoneNumber(current.phoneNumbers[0]?.number))}>
             Add
           </DataTable.Cell>
         </DataTable.Row>)
-     
+
       ))}
     </DataTable>
   </ScrollView>
 )}
 
-        
-      
+
+
     </View>
   );
 }

@@ -7,10 +7,13 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [username, setUsername] = useState("");
+
 
     useEffect(() => {
         const checkLoginStatus = async () => {
-            const username = await AsyncStorage.getItem("username");
+            const username_parameter = await AsyncStorage.getItem("username");
+            setUsername(username_parameter)
             setIsLoggedIn(!!username);
         };
         checkLoginStatus();
@@ -25,7 +28,7 @@ export default function App() {
         <SafeAreaProvider>
             <NavigationContainer>
                 {isLoggedIn ? (
-                    <StackNav onLogout={handleLogout} />
+                    <StackNav username={username} onLogout={handleLogout} />
                 ) : (
                     <LoginPage setIsLoggedIn={setIsLoggedIn} />
                 )}
