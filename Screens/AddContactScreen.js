@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button,ScrollView } from 'react-native';
+import { View, Text,ScrollView } from 'react-native';
 import * as Contacts from 'expo-contacts';
 import contactStyle from '../Styles/contactsStyle';
 import { DataTable, TextInput } from 'react-native-paper';
@@ -13,6 +13,9 @@ export default function AddContactsScreen({route}) {
   const [hasPermission, setHasPermission] = useState(null);
   const [searchContact, setSearchContact] = useState("");
   const [filterArray,setFilterArray]=useState([]);
+  const [addedContacts, setAddedContacts] = useState([]);
+
+  const axiosInstance = axios.create({baseURL: LOCAL_SERVER_URL});
 
 
   const { username } = route.params || {};
@@ -24,6 +27,33 @@ export default function AddContactsScreen({route}) {
   }
 
   }, [hasPermission]);
+
+  useEffect(() => {
+     getContacts()
+    console.log(addedContacts)
+  }, [username]);
+
+  const getContacts = async () => {
+
+    try {
+      // אין צורך להוסיף Content-Type, כי אנחנו שולחים את הנתונים בשורת ה- URL
+      const res = await axiosInstance.get('/contacts/get_contacts', {
+        params: { username: username } // שולחים את הפרמטרים בשורת ה- URL
+      });
+
+      console.log(res.data);
+      const addedContactsMap = res.data.contacts.reduce((acc, contact) => {
+        acc[contact.name] = true;
+        return acc;
+      }, {});
+      setAddedContacts(addedContactsMap);
+
+    } catch (error) {
+      console.error("Request error:", error.response?.data || error.message);
+      alert(error.message);
+    }
+  };
+
 
 
   const getPremition= async()=>{
@@ -70,7 +100,6 @@ export default function AddContactsScreen({route}) {
           )
           // Ensure case-insensitive sorting
 
-      setFilterArray(filtered.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
       for (let i = 0; i < filtered.length; i++) {
         console.log(i+" - " +filtered[i])
       }
@@ -79,12 +108,9 @@ export default function AddContactsScreen({route}) {
     }
   };
 
+
   const addContact = async (contactName, contactPhone) => {
-    console.log()
-    console.log()
-    console.log()
-    console.log("phone: "+ contactPhone )
-    const axiosInstance = axios.create({baseURL: LOCAL_SERVER_URL});
+    if (!addedContacts[contactName]){
     if (username){
     const dataToSend = {
       username: username,
@@ -95,19 +121,46 @@ export default function AddContactsScreen({route}) {
       const res = await axiosInstance.post('/contacts/add_contact', dataToSend, {
         headers: {"Content-Type": "application/json"}
       });
-      console.log("nnn: "+res.data.message);
+      console.log("response: "+res.data.message);
+      if (res.data.errorCode==200) {
+        alert("added")
+        setAddedContacts(prev => ({
+          ...prev,
+          [contactName]: true
+        }));
+        }
     } catch (error) {
       console.error("Request error:", error.response?.data || error.message);
-      if (error.response.errorCode==200){
-        alert("added")
-      }
+      console.log(error.message)
     }
+    }
+    }else
+     deleteContact(contactName,contactPhone)
+  }
+
+  const deleteContact = async (name,phone,) => {
+    try {
+      const res = await axiosInstance.post('/contacts/delete_contact', {name,phone,username}, {
+        headers: {"Content-Type": "application/json"}
+      });
+      console.log("response: " + res.data.message);
+      if (res.data.errorCode == 200) {
+        alert(res.data.message)
+        setAddedContacts(prev => ({
+          ...prev,
+          [name]: false
+        }));
+      }
+
+    } catch (error) {
+      console.error("Request error:", error.response?.data || error.message);
+      console.log(error.message)
     }
   }
 
   return (
     <View style={contactStyle.mainView}>
-     {userContacts.length > 0 && (
+     {userContacts.length > 0 ? (
   <ScrollView>
   <TextInput
     placeholder='search contact'
@@ -141,15 +194,19 @@ export default function AddContactsScreen({route}) {
           ) : (
             <DataTable.Cell style={contactStyle.tableCell} key={`${index}-no-number`}>no number</DataTable.Cell>
           )}
-          <DataTable.Cell style={contactStyle.tableCell} onPress={() => addContact(current.name,formatPhoneNumber(current.phoneNumbers[0]?.number))}>
-            Add
+          <DataTable.Cell  style={contactStyle.tableCell}  onPress={() => addContact(current.name,formatPhoneNumber(current.phoneNumbers[0]?.number))}>
+            {addedContacts[current.name] ? "Delete 🗑️" : "Add"}
           </DataTable.Cell>
         </DataTable.Row>)
 
       ))}
     </DataTable>
   </ScrollView>
-)}
+):
+         <Text>
+           no contacts!!
+         </Text>
+     }
 
 
 
