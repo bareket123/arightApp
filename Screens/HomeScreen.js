@@ -4,26 +4,35 @@ import homeStyle from "../Styles/HomeStyle";
 import { Video} from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import fetchUsername from "../Utils/Persist"
+import {useNavigation} from "@react-navigation/native";
+
+const HomeScreen = ({route}) => {
+    const [u,setU]=useState("")
+    const navigation=useNavigation();
+
+    const { username,id } = route.params || {};
+
+  const x = async () => {
+    const y=await AsyncStorage.getItem('username');
+     setU(y)
+  }
 
 
+    useEffect(() => {
+        const checkStorage = async () => {
+            const storedUsername = await AsyncStorage.getItem('username');
+            console.log("Retrieved username from AsyncStorage:", storedUsername);
+        };
+        checkStorage();
+    });
 
-const HomeScreen = ({navigation}) => {
-    const [username,setUsername]=useState("guest");
-
-    useEffect( () => {
-            const getUsername = async () => {
-              setUsername(await fetchUsername)
-            }
-        getUsername();
-
-    }, [username]);
 
 
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
         <ImageBackground source={require('../Images/homeBackground.jpg')} style={homeStyle.background}>
-           <Text style={homeStyle.userWelcomeText}>HELLO {username}</Text>
+           <Text style={homeStyle.userWelcomeText}>HELLO {username?username:"Guest"}</Text>
             <View style={homeStyle.mainView}>
                 <Text style={homeStyle.header}>What Would You Like To Do ?</Text>
                 <View style={{flexDirection: 'row'}}>

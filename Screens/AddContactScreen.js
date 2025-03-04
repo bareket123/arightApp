@@ -5,6 +5,7 @@ import contactStyle from '../Styles/contactsStyle';
 import { DataTable, TextInput } from 'react-native-paper';
 import axios from "axios";
 import {LOCAL_SERVER_URL} from "../Utils/Constants";
+import LoadingScreen from "./LoadingScreen";
 
 
 
@@ -36,9 +37,8 @@ export default function AddContactsScreen({route}) {
   const getContacts = async () => {
 
     try {
-      // אין צורך להוסיף Content-Type, כי אנחנו שולחים את הנתונים בשורת ה- URL
       const res = await axiosInstance.get('/contacts/get_contacts', {
-        params: { username: username } // שולחים את הפרמטרים בשורת ה- URL
+        params: { username: username }
       });
 
       console.log(res.data);
@@ -159,57 +159,60 @@ export default function AddContactsScreen({route}) {
   }
 
   return (
-    <View style={contactStyle.mainView}>
-     {userContacts.length > 0 ? (
-  <ScrollView>
-  <TextInput
-    placeholder='search contact'
-    mode='outlined'
-    outlineColor='white'
-     placeholderTextColor={'black'}
-     style={contactStyle.searchTextInput}
-     value={searchContact}
-     onChangeText={(text) => {
-        setSearchContact(text);
-        filterContactsArray()
 
-   }}/>
+        userContacts?
+            <View style={contactStyle.mainView}>
+          {userContacts.length > 0 ? (
+                  <ScrollView>
+                    <TextInput
+                        placeholder='search contact'
+                        mode='outlined'
+                        outlineColor='white'
+                        placeholderTextColor={'black'}
+                        style={contactStyle.searchTextInput}
+                        value={searchContact}
+                        onChangeText={(text) => {
+                          setSearchContact(text);
+                          filterContactsArray()
 
-    <DataTable style={contactStyle.container}>
-      <DataTable.Header style={contactStyle.tableHeader}>
-        <DataTable.Title>Name</DataTable.Title>
-        <DataTable.Title>Phone Number</DataTable.Title>
-        <DataTable.Title>Add to List</DataTable.Title>
-      </DataTable.Header>
-      { userContacts.length>0&&(
-        (searchContact == "" ? userContacts : filterArray).map((current, index) => (
-        <DataTable.Row key={index}>
-          <DataTable.Cell style={contactStyle.tableCell}>{current.name}</DataTable.Cell>
-          {current.phoneNumbers && current.phoneNumbers.length > 0 ? (
-            current.phoneNumbers.map((phone, phoneIndex) => (
-              <DataTable.Cell style={contactStyle.tableCell} key={`${index}-${phoneIndex}`}>
-                {phone.number ? formatPhoneNumber(phone.number) : "no number"}
-              </DataTable.Cell>
-            ))
-          ) : (
-            <DataTable.Cell style={contactStyle.tableCell} key={`${index}-no-number`}>no number</DataTable.Cell>
-          )}
-          <DataTable.Cell  style={contactStyle.tableCell}  onPress={() => addContact(current.name,formatPhoneNumber(current.phoneNumbers[0]?.number))}>
-            {addedContacts[current.name] ? "Delete 🗑️" : "Add"}
-          </DataTable.Cell>
-        </DataTable.Row>)
+                        }}/>
 
-      ))}
-    </DataTable>
-  </ScrollView>
-):
-         <Text>
-           no contacts!!
-         </Text>
-     }
+                    <DataTable style={contactStyle.container}>
+                      <DataTable.Header style={contactStyle.tableHeader}>
+                        <DataTable.Title>Name</DataTable.Title>
+                        <DataTable.Title>Phone Number</DataTable.Title>
+                        <DataTable.Title>Add to List</DataTable.Title>
+                      </DataTable.Header>
+                      { userContacts.length>0&&(
+                          (searchContact == "" ? userContacts : filterArray).map((current, index) => (
+                              <DataTable.Row key={index}>
+                                <DataTable.Cell style={contactStyle.tableCell}>{current.name}</DataTable.Cell>
+                                {current.phoneNumbers && current.phoneNumbers.length > 0 ? (
+                                    current.phoneNumbers.map((phone, phoneIndex) => (
+                                        <DataTable.Cell style={contactStyle.tableCell} key={`${index}-${phoneIndex}`}>
+                                          {phone.number ? formatPhoneNumber(phone.number) : "no number"}
+                                        </DataTable.Cell>
+                                    ))
+                                ) : (
+                                    <DataTable.Cell style={contactStyle.tableCell} key={`${index}-no-number`}>no number</DataTable.Cell>
+                                )}
+                                <DataTable.Cell  style={contactStyle.tableCell}  onPress={() => addContact(current.name,formatPhoneNumber(current.phoneNumbers[0]?.number))}>
+                                  {addedContacts[current.name] ? "Delete 🗑️" : "Add"}
+                                </DataTable.Cell>
+                              </DataTable.Row>)
+
+                          ))}
+                    </DataTable>
+                  </ScrollView>
+              ):
+              <Text>
+                no contacts!!
+              </Text>
+          }
+        </View>
+            :
+            <LoadingScreen/>
 
 
-
-    </View>
   );
 }

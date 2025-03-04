@@ -1,24 +1,24 @@
 import { StyleSheet,Dimensions } from 'react-native';
 
 const positionStyle = StyleSheet.create({
- 
+
     container: {
         ...StyleSheet.absoluteFillObject,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor:"black"
-       
+        // backgroundColor:"black"
+
     },
     inputView:{
     flexDirection: 'row',
-     paddingTop: 100, 
+     paddingTop: 100,
      justifyContent: 'center',
     },
      map: {
        width:Dimensions.get('window').width,
         height:Dimensions.get('window').height - 200,
     },
-    
+
     input: {
         padding: 10,
         backgroundColor: 'white',
@@ -37,6 +37,15 @@ const positionStyle = StyleSheet.create({
 
 
 
+    },
+    addressText:{
+       position:"relative",
+        top:0,
+        fontWeight:"bold",
+        fontSize:20,
+        padding: 10,
+        borderRadius: 10,
+        color:"#007fff",
     }
 
 })
